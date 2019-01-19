@@ -1,5 +1,7 @@
 #!/usr/bin/env node
+
 'use strict';
+
 function writetest() {
     console.log("test");
 
@@ -50,6 +52,8 @@ function ETHM1AnswerToArray(answer) {
 function verifyAnswer(answer) {
     const frmHdr = 'FE,FE';
     const frmFtr = 'FE,0D';
+    console.log(answer.slice(-4, -2).toString() + ' == ' + calcCRC(answer.slice(2, -4)).toString() );
+
     if (answer.slice(0, 2).toString() == frmHdr &&
         answer.slice(-2).toString() == frmFtr &&
         answer.slice(-4, -2).toString() == calcCRC(answer.slice(2, -4)).toString()
@@ -74,15 +78,6 @@ function getCommand_ethminfo() {
     return createFrameArray(["7E"]);
 }
 
-function createFrameArray(cmd) {
-    // cmd must be array
-    //	Frame structure
-    //	[ 0xFE | 0xFE | cmd | d1 | d2 | ... | dn | crc.high | crc.low | 0xFE | 0x0D ]
-    const frmHdr = ['FE', 'FE'];
-    const frmFtr = ['FE', '0D'];
-    let crc = calcCRC(cmd);
-    return frmHdr.concat(cmd).concat(crc).concat(frmFtr);
-}
 
 function executeCommand(input, callback) {
     const net = require('net');
@@ -92,13 +87,13 @@ function executeCommand(input, callback) {
     alarm.setTimeout(750);
 
     // connect to alarm system
-    alarm.connect('9999', '192.168.1.10', () => {
+    alarm.connect('7094', '192.168.1.10', () => {
         if (debugEnabled) {
             console.log("Connected to " + alarm.remoteAddress + ":" + alarm.remotePort);
             console.log(" * Send command: " + input.join('').match(/.{2}/g));
         }
         // if connected, send command in binary format
-        alarm.write(new Buffer(input.join(''), 'hex'));
+        alarm.write(Buffer.from(input.join(''), 'hex'));
     });
     // upon receiving data from the alarm
     // receiving data from a socket is asynchronous, so a return value is not properly set
@@ -203,7 +198,7 @@ function parsePayload(payload) {
             // });
             // 11 bytes for the version
             let version_array = byteArrayToDec(answer.slice(1, 12));
-            let r = function(p, c) {
+            let r = function (p, c) {
                 return p.replace(/%s/, c);
             };
             let avers = version_array.reduce(r, "%s.%s%s %s%s%s%s-%s%s-%s%s");
@@ -216,6 +211,9 @@ function parsePayload(payload) {
             switch (hex2dec(answer[12])) {
                 case 1:
                     alang = 'English';
+                    break;
+                case 6:
+                    alang = 'Italian';
                     break;
                 case 9:
                     alang = 'Dutch';
