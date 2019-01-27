@@ -1,0 +1,19 @@
+{
+  "name": "node-red-contrib-satel-integra",
+  "version": "1.0.0",
+  "description": "",
+  "main": "node-red-contrib-satel-integra.js",
+  "scripts": {
+    "test": "jasmine"
+  },
+  "dependencies": {
+  },
+  "keywords": [ "node-red" ],
+  "author": "",
+  "license": "ISC",
+  "node-red" : {
+    "nodes": {
+        "satel-integra": "src/satel-integra.js"
+    }
+  }
+}

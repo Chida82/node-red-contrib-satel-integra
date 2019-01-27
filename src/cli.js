@@ -79,6 +79,7 @@ function getCommand_ethminfo() {
 }
 
 
+
 function executeCommand(input, callback) {
     const net = require('net');
     const alarm = new net.Socket();
@@ -296,6 +297,11 @@ function parsePayload(payload) {
     }
 }
 
+// Export node module.
+if ( typeof module !== 'undefined' && module.hasOwnProperty('exports') )
+{
+    module.exports = calcCRC;
+}
 
 executeCommand(getCommand_ethminfo(), (data) => {
     parsePayload(data);
